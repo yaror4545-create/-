@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вгадай число</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --warn:#ffb020;
+      --bad:#ff4d6d;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        radial-gradient(600px 600px at 50% 110%, rgba(53,208,127,.12), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .wrap{
+      width:min(520px, 100%);
+    }
+
+    .card{
+      position:relative;
+      padding:26px 24px 22px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.8);
+      box-shadow:
+        0 18px 45px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,255,255,.03) inset;
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(260px 120px at 20% 10%, rgba(124,92,255,.25), transparent 70%),
+        radial-gradient(260px 120px at 85% 25%, rgba(24,210,255,.20), transparent 70%);
+      pointer-events:none;
+      filter: blur(2px);
+    }
+
+    .top{
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,87,.9);
+      background:rgba(0,0,0,.18);
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 0 12px rgba(124,92,255,.55);
+      flex:0 0 auto;
+    }
+
+    .grid{
+      position:relative;
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .field{
+      display:flex;
+      gap:12px;
+      align-items:stretch;
+    }
+
+    input[type="number"]{
+      flex:1;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,87,.9);
+      outline:none;
+      font-size:16px;
+      color:var(--text);
+      background:rgba(0,0,0,.22);
+      transition:.2s;
+    }
+    input[type="number"]::placeholder{ color:rgba(170,182,214,.7); }
+    input[type="number"]:focus{
+      border-color: rgba(124,92,255,.9);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+    }
+    input[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .btns{
+      display:flex;
+      gap:10px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:13px 14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+      min-width:140px;
+    }
+
+    .primary{
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.22);
+    }
+    .primary:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .primary:active{ transform: translateY(0px); filter: brightness(.98); }
+
+    .ghost{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(42,53,87,.9);
+    }
+    .ghost:hover{ background:rgba(255,255,255,.09); transform: translateY(-1px); }
+    .ghost:active{ transform: translateY(0px); }
+
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .stat{
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.14);
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .stat b{ color:var(--text); }
+
+    .progress{
+      margin-top:12px;
+      height:10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(42,53,87,.7);
+      overflow:hidden;
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--glow), var(--glow2));
+      box-shadow: 0 0 16px rgba(24,210,255,.22);
+      transition: width .25s ease;
+    }
+
+    .result{
+      margin-top:14px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.12);
+      min-height:54px;
+      white-space:pre-line;
+      line-height:1.35;
+      font-weight:700;
+    }
+
+    .hint{
+      margin-top:10px;
+      color:rgba(170,182,214,.85);
+      font-size:12px;
+      text-align:center;
+    }
+
+    @media (max-width:480px){
+      button{ min-width:unset; flex:1; }
+      .stats{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <div class="title">
+          <h1>Вгадай число</h1>
+          <div class="subtitle">Я загадав число від <b>0</b> до <b>100</b>. Натисни Enter для перевірки.</div>
+        </div>
+        <div class="pill"><span class="dot"></span><span id="modeText">Гра активна</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <input type="number" id="guessInput" placeholder="Наприклад: 42" min="0" max="100" />
+        </div>
+
+        <div class="btns">
+          <button class="primary" id="checkBtn">Перевірити</button>
+          <button class="ghost" id="newGameBtn">Нова гра</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><span>Діапазон</span><b>0–100</b></div>
+          <div class="stat"><span>Спроби</span><b id="tries">0</b></div>
+        </div>
+
+        <div class="progress" title="Умовний прогрес (чим більше спроб — тим більше смужка)">
+          <div class="bar" id="bar"></div>
+        </div>
+
+        <div id="guessResult" class="result">Я загадав число. Спробуй 🙂</div>
+        <div class="hint">Підказка: буде “тепліше/холодніше” після 2-ї спроби.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("guessInput");
+    const resultDiv = document.getElementById("guessResult");
+    const triesEl = document.getElementById("tries");
+    const bar = document.getElementById("bar");
+    const modeText = document.getElementById("modeText");
+
+    const checkBtn = document.getElementById("checkBtn");
+    const newGameBtn = document.getElementById("newGameBtn");
+
+    let hiddenNumber;
+    let tries = 0;
+    let lastDiff = null;
+    let gameOver = false;
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function setMsg(text, color) {
+      resultDiv.textContent = text;
+      resultDiv.style.color = color || "var(--text)";
+    }
+
+    function setProgress() {
+      // просто “красивый” прогресс: до 12 попыток заполняется до 100%
+      const p = Math.min(tries / 12, 1) * 100;
+      bar.style.width = p.toFixed(0) + "%";
+    }
+
+    function newGame() {
+      hiddenNumber = randInt(0, 100);
+      tries = 0;
+      lastDiff = null;
+      gameOver = false;
+
+      triesEl.textContent = tries;
+      setProgress();
+
+      input.value = "";
+      input.disabled = false;
+      checkBtn.disabled = false;
+
+      modeText.textContent = "Гра активна";
+      setMsg("Я загадав число. Спробуй 🙂", "var(--text)");
+      input.focus();
+      // console.log("hidden:", hiddenNumber);
+    }
+
+    function checkGuess() {
+      if (gameOver) return;
+
+      const raw = input.value.trim();
+      const guess = Number(raw);
+
+      if (raw === "" || Number.isNaN(guess)) {
+        setMsg("Введіть число!", "var(--bad)");
+        return;
+      }
+
+      if (guess < 0 || guess > 100) {
+        setMsg("Помилка. Введіть число від 0 до 100.", "var(--bad)");
+        return;
+      }
+
+      tries++;
+      triesEl.textContent = tries;
+      setProgress();
+
+      const diff = Math.abs(hiddenNumber - guess);
+
+      if (guess === hiddenNumber) {
+        setMsg(`Вітаю! Ви вгадали 🎉\nСпроб: ${tries}`, "var(--good)");
+        gameOver = true;
+        input.disabled = true;
+        checkBtn.disabled = true;
+        modeText.textContent = "Перемога!";
+        return;
+      }
+
+      let baseHint = guess > hiddenNumber ? "Загадане число менше ⬇️" : "Загадане число більше ⬆️";
+      let warmHint = "";
+
+      if (lastDiff !== null) {
+        if (diff < lastDiff) warmHint = "\nТепліше 🔥";
+        else if (diff > lastDiff) warmHint = "\nХолодніше 🧊";
+        else warmHint = "\nТак само близько 🙂";
+      }
+
+      lastDiff = diff;
+
+      const color = guess > hiddenNumber ? "var(--warn)" : "var(--glow2)";
+      setMsg(baseHint + warmHint, color);
+
+      input.select();
+      input.focus();
+    }
+
+    checkBtn.addEventListener("click", checkGuess);
+    newGameBtn.addEventListener("click", newGame);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") checkGuess();
+    });
+
+    newGame();
+  </script>
+</body>
+</html>

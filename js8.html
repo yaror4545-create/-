@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Генератор випадкових чисел</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --bad:#ff4d6d;
+      --warn:#ffb020;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .card{
+      width:min(520px,100%);
+      padding:26px 24px 22px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    h2{
+      margin:0 0 6px;
+      font-size:22px;
+    }
+
+    .sub{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:16px;
+    }
+
+    .grid{
+      display:grid;
+      gap:10px;
+    }
+
+    input[type="number"]{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,87,.9);
+      outline:none;
+      font-size:16px;
+      color:var(--text);
+      background:rgba(0,0,0,.25);
+      transition:.2s;
+    }
+    input::placeholder{ color:rgba(170,182,214,.7); }
+    input:focus{
+      border-color: rgba(124,92,255,.9);
+      box-shadow:0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top:2px;
+    }
+
+    button{
+      flex:1;
+      padding:13px;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+    }
+
+    .primary{
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+    }
+    .primary:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
+    .ghost{
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:none;
+    }
+    .ghost:hover{ transform:translateY(-1px); background:rgba(255,255,255,.10); }
+
+    .result{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.18);
+      min-height:60px;
+      white-space:pre-line;
+      line-height:1.35;
+      font-weight:700;
+      text-align:left;
+    }
+
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Генератор випадкових чисел</h2>
+    <div class="sub">Введіть два числа — згенеруємо 3 випадкові всередині інтервалу</div>
+
+    <div class="grid">
+      <input type="number" id="num1" placeholder="Перше число (0–99)" min="0" max="99">
+      <input type="number" id="num2" placeholder="Друге число (0–99)" min="0" max="99">
+
+      <div class="row">
+        <button class="ghost" id="clearBtn">Очистити</button>
+        <button class="primary" id="genBtn">Обчислити</button>
+      </div>
+    </div>
+
+    <div class="result" id="result">Результат зʼявиться тут</div>
+    <div class="hint">Enter — згенерувати • Якщо межі сусідні — “всередині” чисел немає</div>
+  </div>
+
+  <script>
+    const n1El = document.getElementById("num1");
+    const n2El = document.getElementById("num2");
+    const resultDiv = document.getElementById("result");
+    const genBtn = document.getElementById("genBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    function setMsg(text, colorVar){
+      resultDiv.textContent = text;
+      resultDiv.style.color = colorVar || "var(--text)";
+    }
+
+    function randInside(min, max){
+      // случайное целое строго внутри (min, max)
+      return Math.floor(Math.random() * (max - min - 1)) + min + 1;
+    }
+
+    function generateNumbers() {
+      const a = Number(n1El.value);
+      const b = Number(n2El.value);
+
+      if (n1El.value.trim() === "" || n2El.value.trim() === "" || Number.isNaN(a) || Number.isNaN(b)) {
+        setMsg("⚠️ Будь ласка, введіть обидва числа!", "var(--warn)");
+        return;
+      }
+
+      const min = Math.min(a, b);
+      const max = Math.max(a, b);
+
+      if (max - min <= 1) {
+        setMsg(
+          `Першe число: ${a}\nДруге число: ${b}\n\n❌ Усередині інтервалу (${min}, ${max}) немає цілих чисел.`,
+          "var(--bad)"
+        );
+        return;
+      }
+
+      const r1 = randInside(min, max);
+      const r2 = randInside(min, max);
+      const r3 = randInside(min, max);
+
+      setMsg(
+        `Перше число: ${a}\nДруге число: ${b}\n\n✔ Три випадкові числа всередині інтервалу (${min}, ${max}): ${r1}, ${r2}, ${r3}`,
+        "var(--good)"
+      );
+    }
+
+    genBtn.addEventListener("click", generateNumbers);
+
+    clearBtn.addEventListener("click", () => {
+      n1El.value = "";
+      n2El.value = "";
+      setMsg("Результат зʼявиться тут", "var(--text)");
+      n1El.focus();
+    });
+
+    // Enter — запуск
+    [n1El, n2El].forEach(el => {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") generateNumbers();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пошук букви</title>
+
+<style>
+  :root{
+    --bg1:#0b1020;
+    --bg2:#0a2230;
+    --card:#0e1629cc;
+    --stroke:#2a3557;
+    --text:#eaf0ff;
+    --muted:#aab6d6;
+    --glow:#7c5cff;
+    --glow2:#18d2ff;
+    --good:#35d07f;
+    --bad:#ff4d6d;
+    --warn:#ffb020;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    color:var(--text);
+    background:
+      radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+      radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+      linear-gradient(135deg, var(--bg1), var(--bg2));
+  }
+
+  .card{
+    width:min(520px,100%);
+    padding:26px 24px 22px;
+    border-radius:22px;
+    background:var(--card);
+    border:1px solid rgba(42,53,87,.85);
+    box-shadow:0 18px 45px rgba(0,0,0,.45);
+    backdrop-filter: blur(10px);
+    text-align:center;
+  }
+
+  h2{
+    margin:0 0 6px;
+    font-size:22px;
+  }
+
+  .sub{
+    margin:0 0 16px;
+    font-size:13px;
+    color:var(--muted);
+  }
+
+  select, input{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid rgba(42,53,87,.9);
+    background:rgba(0,0,0,.22);
+    color:var(--text);
+    outline:none;
+    font-size:16px;
+    transition:.2s;
+    margin:10px 0;
+  }
+  input::placeholder{ color:rgba(170,182,214,.7); }
+  select:focus, input:focus{
+    border-color: rgba(124,92,255,.9);
+    box-shadow:0 0 0 4px rgba(124,92,255,.18);
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:6px;
+  }
+
+  button{
+    border:none;
+    border-radius:14px;
+    padding:13px 14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.18s;
+    user-select:none;
+    min-width:180px;
+  }
+
+  .primary{
+    color:#061021;
+    background:linear-gradient(135deg, var(--glow), var(--glow2));
+    box-shadow:0 10px 30px rgba(124,92,255,.25);
+  }
+  .primary:hover{ transform: translateY(-1px); filter:brightness(1.05); }
+
+  .ghost{
+    color:var(--text);
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(42,53,87,.9);
+    box-shadow:none;
+  }
+  .ghost:hover{
+    background:rgba(255,255,255,.09);
+    transform: translateY(-1px);
+  }
+
+  .result{
+    margin-top:14px;
+    padding:14px;
+    border-radius:16px;
+    border:1px solid rgba(42,53,87,.85);
+    background:rgba(0,0,0,.18);
+    white-space:pre-line;
+    font-size:16px;
+    font-weight:800;
+    min-height:56px;
+    text-align:left;
+    color:var(--text);
+  }
+
+  .hint{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+  }
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Пошук букви</h2>
+    <div class="sub">Обери алфавіт, введи 1 букву та перевір</div>
+
+    <select id="lang">
+      <option value="uk">Український</option>
+      <option value="en">Англійський</option>
+    </select>
+
+    <input id="letter" type="text" maxlength="1" placeholder="Введіть букву...">
+
+    <div class="row">
+      <button class="ghost" id="clearBtn">Очистити</button>
+      <button class="primary" id="checkBtn">Перевірити</button>
+    </div>
+
+    <div id="result" class="result">Результат зʼявиться тут</div>
+    <div class="hint">Enter — перевірити • Підтримка: укр/англ</div>
+  </div>
+
+<script>
+  const uk = ["а","б","в","г","ґ","д","е","є","ж","з","и","і","ї","й","к","л","м","н",
+              "о","п","р","с","т","у","ф","х","ц","ч","ш","щ","ь","ю","я"];
+  const en = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o",
+              "p","q","r","s","t","u","v","w","x","y","z"];
+
+  const langEl = document.getElementById("lang");
+  const letterEl = document.getElementById("letter");
+  const res = document.getElementById("result");
+
+  function setMsg(text, colorVar){
+    res.textContent = text;
+    res.style.color = colorVar || "var(--text)";
+  }
+
+  function checkLetter() {
+    const lang = langEl.value;
+    const letter = letterEl.value.trim().toLowerCase();
+    const alphabet = lang === "uk" ? uk : en;
+
+    if (!letter){
+      setMsg("⚠️ Введіть букву!", "var(--warn)");
+      return;
+    }
+
+    let index = -1;
+    for (let i = 0; i < alphabet.length; i++) {
+      if (alphabet[i] === letter) { index = i + 1; break; }
+    }
+
+    if (index === -1) {
+      setMsg("❌ Такої букви немає в алфавіті.", "var(--bad)");
+    } else {
+      const langName = (lang === "uk") ? "українському" : "англійському";
+      setMsg(`✅ Буква '${letter}' — ${index}-а в ${langName} алфавіті.`, "var(--good)");
+    }
+  }
+
+  document.getElementById("checkBtn").addEventListener("click", checkLetter);
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    letterEl.value = "";
+    setMsg("Результат зʼявиться тут", "var(--text)");
+    letterEl.focus();
+  });
+
+  letterEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") checkLetter();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .card{
+      width:min(620px,100%);
+      padding:22px 22px 18px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    h2{
+      margin:0 0 6px;
+      font-size:22px;
+      letter-spacing:.2px;
+    }
+
+    .sub{
+      margin:0 0 14px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .canvasWrap{
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.18);
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      height:auto;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:13px 14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+      min-width:180px;
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+    }
+    button:hover{ transform: translateY(-1px); filter:brightness(1.05); }
+
+    @media (max-width:520px){
+      button{ min-width:unset; flex:1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Canvas</h2>
+    <div class="sub">Смайлик намальований через 2D контекст</div>
+
+    <div class="canvasWrap">
+      <canvas id="myCanvas" width="500" height="500"></canvas>
+    </div>
+
+    <div class="btnRow">
+      <button onclick="draw()">Перемалювати</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("myCanvas");
+    const cxt = canvas.getContext("2d");
+
+    function draw(){
+      // фон
+      cxt.fillStyle = "#f0f8ff";
+      cxt.fillRect(0, 0, canvas.width, canvas.height);
+
+      // лицо
+      cxt.beginPath();
+      cxt.arc(250, 250, 100, 0, Math.PI*2);
+      cxt.fillStyle = "#FFD700";
+      cxt.fill();
+
+      // левый глаз
+      cxt.beginPath();
+      cxt.arc(210, 220, 20, 0, Math.PI*2);
+      cxt.fillStyle = "white";
+      cxt.fill();
+
+      cxt.beginPath();
+      cxt.arc(210, 220, 10, 0, Math.PI*2);
+      cxt.fillStyle = "black";
+      cxt.fill();
+
+      // правый глаз
+      cxt.beginPath();
+      cxt.arc(290, 220, 20, 0, Math.PI*2);
+      cxt.fillStyle = "white";
+      cxt.fill();
+
+      cxt.beginPath();
+      cxt.arc(290, 220, 10, 0, Math.PI*2);
+      cxt.fillStyle = "black";
+      cxt.fill();
+
+      // улыбка
+      cxt.beginPath();
+      cxt.arc(250, 270, 60, 0, Math.PI);
+      cxt.lineWidth = 5;
+      cxt.strokeStyle = "black";
+      cxt.stroke();
+    }
+
+    draw();
+  </script>
+</body>
+</html>

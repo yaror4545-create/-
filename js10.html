@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Генератор компліментів</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --bad:#ff4d6d;
+      --warn:#ffb020;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .card{
+      width:min(620px,100%);
+      padding:26px 24px 22px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    h2{
+      margin:0 0 6px;
+      font-size:22px;
+    }
+
+    .sub{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:16px;
+    }
+
+    .grid{
+      display:grid;
+      gap:10px;
+      text-align:left;
+    }
+
+    input[type="number"]{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,87,.9);
+      outline:none;
+      font-size:16px;
+      color:var(--text);
+      background:rgba(0,0,0,.25);
+      transition:.2s;
+    }
+    input::placeholder{ color:rgba(170,182,214,.7); }
+    input:focus{
+      border-color: rgba(124,92,255,.9);
+      box-shadow:0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top:2px;
+    }
+
+    button{
+      flex:1;
+      padding:13px;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+    }
+
+    .primary{
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+    }
+    .primary:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+
+    .ghost{
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:none;
+    }
+    .ghost:hover{ transform: translateY(-1px); background:rgba(255,255,255,.10); }
+
+    .result{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.18);
+      min-height:70px;
+      color:var(--text);
+      text-align:left;
+    }
+
+    .cards{
+      display:grid;
+      gap:10px;
+    }
+
+    .compliment{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(255,255,255,.06);
+      font-weight:700;
+      line-height:1.25;
+    }
+
+    .badge{
+      min-width:28px;
+      height:28px;
+      display:grid;
+      place-items:center;
+      border-radius:999px;
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(42,53,87,.85);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      flex:0 0 auto;
+    }
+
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Генератор компліментів</h2>
+    <div class="sub">Введіть кількість і натисніть Enter або кнопку</div>
+
+    <div class="grid">
+      <input type="number" id="numCompliments" placeholder="Скільки компліментів? (1–20)" min="1" max="20">
+
+      <div class="row">
+        <button class="ghost" id="clearBtn">Очистити</button>
+        <button class="primary" id="genBtn">Створити</button>
+      </div>
+    </div>
+
+    <div id="result" class="result">Результат зʼявиться тут</div>
+    <div class="hint">Підказка: можна робити багато разів — буде новий набір 🙂</div>
+  </div>
+
+  <script>
+    const input = document.getElementById("numCompliments");
+    const resultDiv = document.getElementById("result");
+    const genBtn = document.getElementById("genBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const colors = ["#ff4d6d","#18d2ff","#35d07f","#ffb020","#7c5cff","#ffd166","#4cc9f0","#f72585","#b8f2e6","#aab6d6"];
+    const animals = ["cat","dog","elephant","tiger","lion","giraffe","zebra","monkey","kangaroo","panda"];
+    const compliments = ["smart","creative","strong","brave","helpful","clever","skilled","focused","talented","reliable"];
+
+    function setMsg(text, colorVar){
+      resultDiv.textContent = text;
+      resultDiv.style.color = colorVar || "var(--text)";
+    }
+
+    function generateCompliments() {
+      const number = Number(input.value);
+
+      if (input.value.trim() === "" || Number.isNaN(number)) {
+        setMsg("⚠️ Введіть число!", "var(--warn)");
+        return;
+      }
+
+      if (number < 1) {
+        setMsg("⚠️ Введіть число більше 0", "var(--warn)");
+        return;
+      }
+
+      if (number > 20) {
+        setMsg("⚠️ Максимум 20 компліментів 🙂", "var(--warn)");
+        return;
+      }
+
+      resultDiv.innerHTML = "";
+      const wrap = document.createElement("div");
+      wrap.className = "cards";
+
+      for (let i = 0; i < number; i++) {
+        const randColor = colors[Math.floor(Math.random() * colors.length)];
+        const randAnimal = animals[Math.floor(Math.random() * animals.length)];
+        const randCompliment = compliments[Math.floor(Math.random() * compliments.length)];
+
+        const item = document.createElement("div");
+        item.className = "compliment";
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = i + 1;
+
+        const text = document.createElement("div");
+        text.textContent = `You are so ${randCompliment} as a ${randAnimal}!`;
+        text.style.color = randColor;
+
+        item.appendChild(badge);
+        item.appendChild(text);
+        wrap.appendChild(item);
+      }
+
+      resultDiv.appendChild(wrap);
+    }
+
+    genBtn.addEventListener("click", generateCompliments);
+
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      resultDiv.innerHTML = "Результат зʼявиться тут";
+      resultDiv.style.color = "var(--text)";
+      input.focus();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") generateCompliments();
+    });
+  </script>
+</body>
+</html>

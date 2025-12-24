@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Боліди F1</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --warn:#ffb020;
+      --bad:#ff4d6d;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        radial-gradient(600px 600px at 50% 110%, rgba(53,208,127,.12), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .wrap{ width:min(520px, 100%); }
+
+    .card{
+      position:relative;
+      padding:26px 24px 22px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.8);
+      box-shadow:
+        0 18px 45px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,255,255,.03) inset;
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(260px 120px at 20% 10%, rgba(124,92,255,.25), transparent 70%),
+        radial-gradient(260px 120px at 85% 25%, rgba(24,210,255,.20), transparent 70%);
+      pointer-events:none;
+      filter: blur(2px);
+    }
+
+    .top{
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,87,.9);
+      background:rgba(0,0,0,.18);
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 0 12px rgba(124,92,255,.55);
+      flex:0 0 auto;
+    }
+
+    .grid{
+      position:relative;
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    input[type="text"]{
+      width:100%;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,87,.9);
+      outline:none;
+      font-size:16px;
+      color:var(--text);
+      background:rgba(0,0,0,.22);
+      transition:.2s;
+      text-transform: none;
+    }
+    input[type="text"]::placeholder{ color:rgba(170,182,214,.7); }
+    input[type="text"]:focus{
+      border-color: rgba(124,92,255,.9);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    .btns{
+      display:flex;
+      gap:10px;
+    }
+
+    button{
+      flex:1;
+      border:none;
+      border-radius:14px;
+      padding:13px 14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+    }
+
+    .primary{
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.22);
+    }
+    .primary:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .primary:active{ transform: translateY(0px); filter: brightness(.98); }
+
+    .ghost{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(42,53,87,.9);
+    }
+    .ghost:hover{ background:rgba(255,255,255,.09); transform: translateY(-1px); }
+    .ghost:active{ transform: translateY(0px); }
+
+    .result{
+      margin-top:10px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.12);
+      min-height:54px;
+      white-space:pre-line;
+      line-height:1.35;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:4px;
+    }
+
+    .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.14);
+      color:rgba(170,182,214,.95);
+      font-size:12px;
+      cursor:pointer;
+      transition:.15s;
+      user-select:none;
+    }
+    .chip:hover{
+      transform: translateY(-1px);
+      background:rgba(255,255,255,.07);
+    }
+
+    .hint{
+      margin-top:8px;
+      color:rgba(170,182,214,.85);
+      font-size:12px;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <div class="title">
+          <h1>Виберіть болід F1</h1>
+          <div class="subtitle">Введіть назву команди англійською (наприклад: <b>ferrari</b>)</div>
+        </div>
+        <div class="pill"><span class="dot"></span>F1 Selector</div>
+      </div>
+
+      <div class="grid">
+        <input
+          type="text"
+          id="carInput"
+          placeholder="ferrari / mercedes / red bull / mclaren / aston martin"
+          autocomplete="off"
+        />
+
+        <div class="chips" aria-label="Швидкий вибір">
+          <div class="chip" onclick="setCar('ferrari')">Ferrari</div>
+          <div class="chip" onclick="setCar('mercedes')">Mercedes</div>
+          <div class="chip" onclick="setCar('red bull')">Red Bull</div>
+          <div class="chip" onclick="setCar('mclaren')">McLaren</div>
+          <div class="chip" onclick="setCar('aston martin')">Aston Martin</div>
+        </div>
+
+        <div class="btns">
+          <button class="primary" id="checkBtn">Перевірити</button>
+          <button class="ghost" id="clearBtn">Очистити</button>
+        </div>
+
+        <div id="carResult" class="result">Введіть команду або натисніть на кнопку-мітку вище 🙂</div>
+        <div class="hint">Підказка: можна натиснути <b>Enter</b>, щоб перевірити.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("carInput");
+    const r = document.getElementById("carResult");
+    const checkBtn = document.getElementById("checkBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    function setMsg(text, colorVar){
+      r.textContent = text;
+      r.style.color = colorVar || "var(--text)";
+    }
+
+    function setCar(name){
+      input.value = name;
+      input.focus();
+      checkCar();
+    }
+
+    function checkCar() {
+      let car = input.value.trim().toLowerCase();
+
+      switch (car) {
+        case "ferrari":
+          setMsg("Ferrari — червоний болід італійської команди.", "var(--good)");
+          break;
+
+        case "mercedes":
+          setMsg("Mercedes — срібний болід з потужним двигуном.", "var(--good)");
+          break;
+
+        case "red bull":
+        case "redbull":
+          setMsg("Red Bull — швидкий болід чемпіонської команди.", "var(--good)");
+          break;
+
+        case "mclaren":
+        case "mc laren":
+          setMsg("McLaren — помаранчевий болід з хорошим балансом.", "var(--good)");
+          break;
+
+        case "aston martin":
+        case "astonmartin":
+          setMsg("Aston Martin — зелений болід з сильною аеродинамікою.", "var(--good)");
+          break;
+
+        case "":
+          setMsg("Спочатку введіть назву команди 🙂", "var(--warn)");
+          break;
+
+        default:
+          setMsg("Такого боліда немає.", "var(--bad)");
+      }
+    }
+
+    checkBtn.addEventListener("click", checkCar);
+
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      setMsg("Введіть команду або натисніть на кнопку-мітку вище 🙂", "var(--text)");
+      input.focus();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") checkCar();
+    });
+  </script>
+</body>
+</html>

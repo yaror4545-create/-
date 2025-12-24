@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas: Шахівниця / Квадратики</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --bad:#ff4d6d;
+      --warn:#ffb020;
+    }
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .wrap{
+      width:min(760px, 100%);
+      display:grid;
+      gap:14px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.85);
+      border-radius:22px;
+      padding:22px 22px 18px;
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    h2{
+      margin:0 0 6px;
+      font-size:22px;
+    }
+    .sub{
+      margin:0 0 14px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    select, input{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,87,.9);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      outline:none;
+      font-size:16px;
+      transition:.2s;
+      margin:10px 0;
+    }
+    input::placeholder{ color:rgba(170,182,214,.7); }
+    select:focus, input:focus{
+      border-color: rgba(124,92,255,.9);
+      box-shadow:0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:13px 14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+      min-width:180px;
+    }
+
+    .primary{
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+    }
+    .primary:hover{ transform: translateY(-1px); filter:brightness(1.05); }
+
+    .ghost{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(42,53,87,.9);
+      box-shadow:none;
+    }
+    .ghost:hover{
+      background:rgba(255,255,255,.09);
+      transform: translateY(-1px);
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    /* Canvas container */
+    .canvasCard{
+      padding:16px;
+    }
+
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:18px;
+      border:1px solid rgba(42,53,87,.85);
+      background:#ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    @media (max-width:520px){
+      button{ min-width:unset; flex:1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- Вибір завдання -->
+    <div id="selectBox" class="card">
+      <h2>Оберіть завдання</h2>
+      <div class="sub">Шахівниця або анімація квадратиків</div>
+
+      <select id="taskSelector">
+        <option value="" disabled selected>-- Оберіть завдання --</option>
+        <option value="chess">Шахівниця</option>
+        <option value="squares">Квадратики</option>
+      </select>
+
+      <div class="row">
+        <button class="primary" onclick="startTask()">Продовжити</button>
+      </div>
+
+      <div class="hint">Порада: після вибору натисни Enter (можна додати, якщо хочеш)</div>
+    </div>
+
+    <!-- Форма для квадратиків -->
+    <div id="squareForm" class="card" style="display:none;">
+      <h2>Кількість квадратів</h2>
+      <div class="sub">Введіть число (наприклад: 10) і натисніть “Старт!”</div>
+
+      <input type="number" id="squareCount" placeholder="Введіть кількість квадратів" min="1">
+
+      <div class="row">
+        <button class="ghost" onclick="goBack()">Назад</button>
+        <button class="primary" onclick="startSquares()">Старт!</button>
+      </div>
+
+      <div class="hint">Enter — старт</div>
+    </div>
+
+    <!-- Canvas + керування -->
+    <div id="canvasBlock" class="card canvasCard" style="display:none;">
+      <div class="row" style="margin-top:0; margin-bottom:12px;">
+        <button class="ghost" onclick="goBack()">Назад</button>
+        <button class="primary" onclick="restart()">Перезапустити</button>
+      </div>
+
+      <canvas id="canvas" width="600" height="600"></canvas>
+
+      <div id="modeHint" class="hint"></div>
+    </div>
+
+  </div>
+
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const selectBox = document.getElementById("selectBox");
+  const squareForm = document.getElementById("squareForm");
+  const canvasBlock = document.getElementById("canvasBlock");
+  const modeHint = document.getElementById("modeHint");
+
+  let currentMode = "";     // "chess" | "squares"
+  let animId = null;        // requestAnimationFrame id
+  let squares = [];
+
+  function stopAnim(){
+    if (animId) cancelAnimationFrame(animId);
+    animId = null;
+  }
+
+  function startTask(){
+    const val = document.getElementById("taskSelector").value;
+    if(!val) return;
+
+    currentMode = val;
+    selectBox.style.display = "none";
+
+    if(val === "chess"){
+      squareForm.style.display = "none";
+      canvasBlock.style.display = "block";
+      startChess();
+    }
+
+    if(val === "squares"){
+      squareForm.style.display = "block";
+      canvasBlock.style.display = "none";
+      stopAnim();
+    }
+  }
+
+  function goBack(){
+    stopAnim();
+    squares = [];
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    selectBox.style.display = "block";
+    squareForm.style.display = "none";
+    canvasBlock.style.display = "none";
+    currentMode = "";
+  }
+
+  function restart(){
+    if(currentMode === "chess") startChess();
+    else if(currentMode === "squares") startSquares();
+  }
+
+  function startChess(){
+    stopAnim();
+    currentMode = "chess";
+    canvasBlock.style.display = "block";
+
+    const size = canvas.width / 8;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    for(let r=0;r<8;r++){
+      for(let c=0;c<8;c++){
+        ctx.fillStyle = (r+c)%2===0 ? "white" : "black";
+        ctx.fillRect(c*size, r*size, size, size);
+      }
+    }
+    modeHint.textContent = "Режим: Шахівниця (8×8)";
+  }
+
+  function startSquares(){
+    stopAnim();
+    currentMode = "squares";
+
+    let count = parseInt(document.getElementById("squareCount").value);
+    if(isNaN(count) || count <= 0) return;
+
+    squareForm.style.display = "none";
+    canvasBlock.style.display = "block";
+    modeHint.textContent = "Режим: Квадратики (анімація)";
+
+    squares = [];
+    for(let i=0;i<count;i++){
+      const size = 30;
+      squares.push({
+        x: Math.random()*(canvas.width - size),
+        y: Math.random()*(canvas.height - size),
+        dx: 2 + Math.random()*2,
+        dy: 2 + Math.random()*2,
+        size,
+        color: randomColor()
+      });
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      for(const s of squares){
+        s.x += s.dx;
+        s.y += s.dy;
+
+        if(s.x <= 0){ s.x = 0; s.dx *= -1; }
+        if(s.y <= 0){ s.y = 0; s.dy *= -1; }
+        if(s.x + s.size >= canvas.width){ s.x = canvas.width - s.size; s.dx *= -1; }
+        if(s.y + s.size >= canvas.height){ s.y = canvas.height - s.size; s.dy *= -1; }
+
+        ctx.fillStyle = s.color;
+        ctx.strokeStyle = "black";
+        ctx.fillRect(s.x, s.y, s.size, s.size);
+        ctx.strokeRect(s.x, s.y, s.size, s.size);
+      }
+
+      animId = requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  function randomColor(){
+    return `rgb(${rnd()},${rnd()},${rnd()})`;
+  }
+  function rnd(){
+    return Math.floor(Math.random()*256);
+  }
+
+  // Enter в форме квадратов
+  document.getElementById("squareCount").addEventListener("keydown", (e) => {
+    if(e.key === "Enter") startSquares();
+  });
+</script>
+</body>
+</html>

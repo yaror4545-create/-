@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Завдання</title>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#0b1020,#0a2230);
+  color:#eaf0ff;
+}
+
+.card{
+  width:700px;
+  max-width:95%;
+  background:rgba(14,22,41,.85);
+  border:1px solid #2a3557;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 18px 45px rgba(0,0,0,.45);
+  text-align:center;
+}
+
+select, button{
+  padding:12px 16px;
+  border-radius:14px;
+  border:none;
+  font-size:16px;
+  margin:8px;
+}
+
+select{
+  width:80%;
+}
+
+button{
+  cursor:pointer;
+  font-weight:700;
+  background:linear-gradient(135deg,#7c5cff,#18d2ff);
+  color:#061021;
+}
+
+button.back{
+  background:rgba(255,255,255,.08);
+  color:#eaf0ff;
+  border:1px solid #2a3557;
+}
+
+#numbersBox{
+  margin-top:14px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(0,0,0,.25);
+  border:1px solid #2a3557;
+  font-size:32px;
+  color:#18d2ff;
+  min-height:80px;
+  word-wrap:break-word;
+}
+
+.track{
+  margin-top:16px;
+  height:160px;
+  border-radius:20px;
+  background:rgba(0,0,0,.25);
+  border:1px solid #2a3557;
+  position:relative;
+  overflow:hidden;
+}
+
+#train{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:260px;
+  left:-260px;
+}
+
+.hide{ display:none; }
+</style>
+</head>
+
+<body>
+
+<!-- Вибір -->
+<div class="card" id="selectBox">
+  <h2>Оберіть завдання</h2>
+
+  <select id="task">
+    <option disabled selected>-- Оберіть --</option>
+    <option value="numbers">✨ Чарівні числа</option>
+    <option value="train">🚆 Потяг</option>
+  </select>
+  <br>
+  <button onclick="start()">Продовжити</button>
+</div>
+
+<!-- Чарівні числа -->
+<div class="card hide" id="numbersTask">
+  <h2>✨ Чарівні числа</h2>
+  <div id="numbersBox"></div>
+  <button class="back" onclick="back()">Назад</button>
+</div>
+
+<!-- Потяг -->
+<div class="card hide" id="trainTask">
+  <div class="track" id="track">
+    <svg id="train" viewBox="0 0 260 90">
+      <rect x="0" y="20" width="180" height="50" rx="25" fill="#1fd3ff"/>
+      <rect x="120" y="20" width="140" height="50" rx="25" fill="#7c5cff"/>
+      <rect x="155" y="32" width="45" height="26" rx="6" fill="#eaf0ff"/>
+      <circle cx="70" cy="75" r="8" fill="#000"/>
+      <circle cx="120" cy="75" r="8" fill="#000"/>
+      <circle cx="170" cy="75" r="8" fill="#000"/>
+    </svg>
+  </div>
+  <button class="back" onclick="back()">Назад</button>
+</div>
+
+<script>
+let interval;
+let i = 1;
+
+// старт
+function start(){
+  const val = document.getElementById("task").value;
+  if(!val) return;
+
+  document.getElementById("selectBox").classList.add("hide");
+
+  if(val === "numbers"){
+    document.getElementById("numbersTask").classList.remove("hide");
+    startNumbers();
+  }
+  if(val === "train"){
+    document.getElementById("trainTask").classList.remove("hide");
+    startTrain();
+  }
+}
+
+// чарівні числа
+function startNumbers(){
+  clearInterval(interval);
+  i = 1;
+  const box = document.getElementById("numbersBox");
+  box.textContent = "";
+
+  interval = setInterval(()=>{
+    box.textContent += i + " ";
+    i++;
+  }, 400);
+}
+
+// потяг
+const train = document.getElementById("train");
+const track = document.getElementById("track");
+let x = -260;
+let anim;
+
+function startTrain(){
+  cancelAnimationFrame(anim);
+  x = -260;
+
+  function move(){
+    x += 3;
+    train.style.left = x + "px";
+    if(x > track.clientWidth){
+      x = -260;
+    }
+    anim = requestAnimationFrame(move);
+  }
+  move();
+}
+
+// назад
+function back(){
+  clearInterval(interval);
+  cancelAnimationFrame(anim);
+
+  document.getElementById("numbersTask").classList.add("hide");
+  document.getElementById("trainTask").classList.add("hide");
+  document.getElementById("selectBox").classList.remove("hide");
+}
+</script>
+
+</body>
+</html>

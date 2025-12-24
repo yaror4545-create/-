@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Перевірка об'єкта</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --bad:#ff4d6d;
+      --warn:#ffb020;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .card{
+      width:min(640px,100%);
+      padding:26px 24px 22px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    h2{
+      margin:0 0 6px;
+      font-size:22px;
+    }
+
+    .sub{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:16px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top:2px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    button{
+      padding:13px 14px;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s;
+      user-select:none;
+      min-width:180px;
+    }
+
+    .primary{
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+    }
+    .primary:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+
+    .ghost{
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid rgba(42,53,87,.85);
+      box-shadow:none;
+    }
+    .ghost:hover{ transform: translateY(-1px); background:rgba(255,255,255,.10); }
+
+    .result{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.18);
+      min-height:84px;
+      color:var(--text);
+      text-align:left;
+      white-space:pre-line;
+      line-height:1.35;
+      font-weight:700;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+      text-align:left;
+    }
+    .chip{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(255,255,255,.06);
+      color:var(--muted);
+      font-weight:700;
+    }
+    .chip b{ color:var(--text); }
+
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    @media (max-width:520px){
+      .grid2{ grid-template-columns:1fr; }
+      button{ min-width:unset; flex:1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Перевірка порожнього об'єкта</h2>
+    <div class="sub">Кнопками змінюй <b>schedule</b> і перевіряй, чи він порожній</div>
+
+    <div class="row">
+      <button class="ghost" id="btnAdd">Додати запис</button>
+      <button class="ghost" id="btnClear">Очистити</button>
+      <button class="primary" id="btnCheck">Перевірити</button>
+    </div>
+
+    <div class="grid2">
+      <div class="chip">Статус: <b id="status">—</b></div>
+      <div class="chip">К-сть властивостей: <b id="count">0</b></div>
+    </div>
+
+    <div id="out" class="result">Натисни “Перевірити”, щоб побачити результат.</div>
+    <div class="hint">Показуємо не true/false, а “Порожній / Не порожній” ✅</div>
+  </div>
+
+  <script>
+    // Дані
+    const schedule = {};
+
+    // Перевірка (інший стиль, ніж for..in)
+    function isEmpty(obj){
+      return Object.keys(obj).length === 0;
+    }
+
+    // UI
+    const out = document.getElementById("out");
+    const statusEl = document.getElementById("status");
+    const countEl = document.getElementById("count");
+
+    function render(){
+      const keys = Object.keys(schedule);
+      const empty = keys.length === 0;
+
+      statusEl.textContent = empty ? "Порожній" : "Не порожній";
+      statusEl.style.color = empty ? "var(--warn)" : "var(--good)";
+
+      countEl.textContent = String(keys.length);
+
+      if (empty){
+        out.textContent = "✅ Об'єкт schedule порожній.\n(Жодної властивості не знайдено)";
+        out.style.color = "var(--warn)";
+        return;
+      }
+
+      const lines = keys.map((k, i) => `${i+1}) ${k} → ${schedule[k]}`);
+      out.textContent = "❗ Об'єкт schedule НЕ порожній.\nОсь що всередині:\n" + lines.join("\n");
+      out.style.color = "var(--good)";
+    }
+
+    // Дії
+    document.getElementById("btnAdd").addEventListener("click", () => {
+      const t = new Date();
+      const key = t.getHours().toString().padStart(2,"0") + ":" + t.getMinutes().toString().padStart(2,"0");
+      schedule[key] = "подія";
+      render();
+    });
+
+    document.getElementById("btnClear").addEventListener("click", () => {
+      for (const k of Object.keys(schedule)) delete schedule[k];
+      render();
+    });
+
+    document.getElementById("btnCheck").addEventListener("click", render);
+
+    // старт
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Перевірка знань</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0a2230;
+      --card:#0e1629cc;
+      --stroke:#2a3557;
+      --text:#eaf0ff;
+      --muted:#aab6d6;
+      --glow:#7c5cff;
+      --glow2:#18d2ff;
+      --good:#35d07f;
+      --bad:#ff4d6d;
+      --warn:#ffb020;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .card{
+      width:min(520px,100%);
+      padding:26px 24px 22px;
+      border-radius:22px;
+      background:var(--card);
+      border:1px solid rgba(42,53,87,.8);
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+    }
+
+    h1{
+      margin:0 0 6px;
+      font-size:20px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:14px;
+    }
+
+    input{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,87,.9);
+      outline:none;
+      font-size:16px;
+      color:var(--text);
+      background:rgba(0,0,0,.25);
+      transition:.2s;
+    }
+
+    input::placeholder{ color:rgba(170,182,214,.7); }
+
+    input:focus{
+      border-color: rgba(124,92,255,.9);
+      box-shadow:0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    button{
+      width:100%;
+      margin-top:12px;
+      padding:13px;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      cursor:pointer;
+      color:#061021;
+      background:linear-gradient(135deg, var(--glow), var(--glow2));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+      transition:.18s;
+    }
+
+    button:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .result{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(42,53,87,.85);
+      background:rgba(0,0,0,.18);
+      min-height:48px;
+      font-weight:700;
+      text-align:center;
+    }
+
+    .hint{
+      margin-top:8px;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>Перевірка знань</h1>
+    <div class="subtitle">
+      Як звуть головного героя фільму «Гаррі Поттер»?
+    </div>
+
+    <input type="text" id="heroInput" placeholder="Введіть імʼя героя">
+
+    <button onclick="checkHero()">Перевірити</button>
+
+    <div id="heroResult" class="result">
+      Введіть відповідь та натисніть кнопку
+    </div>
+
+    <div class="hint">Підказка: відповідь з двох слів 😉</div>
+  </div>
+
+  <script>
+    function checkHero() {
+      const value = document.getElementById("heroInput").value.trim().toLowerCase();
+      const result = document.getElementById("heroResult");
+
+      if (value === "гаррі поттер") {
+        result.textContent = "✅ Правильно!";
+        result.style.color = "var(--good)";
+      } else if (value === "") {
+        result.textContent = "⚠️ Спочатку введіть відповідь";
+        result.style.color = "var(--warn)";
+      } else {
+        result.textContent = "❌ Неправильно. Правильна відповідь: Гаррі Поттер.";
+        result.style.color = "var(--bad)";
+      }
+    }
+  </script>
+
+</body>
+</html>
