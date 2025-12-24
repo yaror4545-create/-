@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мої роботи з JavaScript</title>
+
+<style>
+:root{
+  --bg1:#0b1020;
+  --bg2:#0a2230;
+  --card:#0e1629cc;
+  --stroke:#2a3557;
+  --text:#eaf0ff;
+  --muted:#aab6d6;
+  --a1:#7c5cff;
+  --a2:#18d2ff;
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  font-family:system-ui,Segoe UI,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 10% 10%, rgba(124,92,255,.25), transparent 60%),
+    radial-gradient(700px 450px at 90% 20%, rgba(24,210,255,.18), transparent 55%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+}
+
+.card{
+  width:min(1100px,100%);
+  background:var(--card);
+  border:1px solid var(--stroke);
+  border-radius:22px;
+  padding:24px;
+  box-shadow:0 18px 45px rgba(0,0,0,.45);
+  backdrop-filter:blur(10px);
+}
+
+h1{
+  margin:0 0 6px;
+  text-align:center;
+  font-size:30px;
+}
+.sub{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:22px;
+  font-size:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:14px;
+}
+
+a{
+  display:block;
+  padding:16px;
+  border-radius:18px;
+  text-decoration:none;
+  font-weight:700;
+  color:#061021;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  transition:.2s;
+}
+a:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+footer{
+  margin-top:20px;
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>🚀 Мої роботи з JavaScript</h1>
+  <p class="sub">Натисни на роботу — відкриється окрема сторінка</p>
+
+  <div class="grid">
+    <!-- ПЕРВЫЕ 3 (ПЕРЕДЕЛАНЫ) -->
+    <a href="js.html"> планети</a>
+    <a href="js1.html">🧾 Прямокутник та привітання</a>
+    <a href="js2.html">📐 Трикутник</a>
+
+    <!-- ДАЛЬШЕ ПО ТЕМЕ -->
+    <a href="js3.html">🎨 вгадай число від 1 до 50</a>
+    <a href="js4.html">Перевірка знань фільму гаррі поттер</a>
+    <a href="js5.html">болід</a>
+
+    <a href="js6.html">✨ вгадай число </a>
+    <a href="js7.html"> Факторіал</a>
+    <a href="js8.html">🎲 Випадкові числа</a>
+
+    <a href="js9.html">🔎 Пошук підрядка</a>
+    <a href="js10.html">💬 Генератор компліментів</a>
+    <a href="js11.html">Перевірка порожнього об'єкта</a>
+    <a href="js12.html">Символи Unicode Сума цифр числа та Таблиця множення  </a>
+
+    <a href="js13.html">🔤 Пошук букви (алфавіт)</a>
+
+    <a href="js14.html">🟦 Геометричні фігури</a>
+    <a href="js15.html"> Смайлик</a>
+    <a href="js16.html">🚆 Потяг та числа</a>
+  </div>
+
+  <footer>© 2025 | Зроблено власноруч 💙</footer>
+</div>
+
+</body>
+</html>
